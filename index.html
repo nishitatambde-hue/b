@@ -17,7 +17,7 @@
   <style>
     :root {
       color-scheme: dark;
-      --card-glow-color: #2b2b2b; /* default glow colour */
+      --card-glow-color: #2b2b2b; /* default inner glow for cards */
     }
 
     html {
@@ -57,7 +57,7 @@
       inset: 0;
       z-index: -5;
       pointer-events: none;
-      opacity: 0.06; /* softer so it doesn’t interfere */
+      opacity: 0.06;
       background-image:
         linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px),
         linear-gradient(180deg, rgba(255,255,255,0.04) 1px, transparent 1px);
@@ -79,14 +79,12 @@
     .glass-dark {
       position: relative;
       color: #f9fafb;
-
       border-radius: 40px;
       overflow: hidden;
 
-      /* OPAQUE soft inner glow – driven by variable */
+      /* OPAQUE soft inner glow driven by variable */
       background:
-        radial-gradient(circle at 50% 40%, var(--card-glow-color) 0%, #050505 55%);
-
+        radial-gradient(circle at 50% 40%, var(--card-glow-color) 1%, #050505 10%);
 
       /* bright outline */
       border: 1px solid rgba(255, 255, 255, 0.24);
@@ -94,10 +92,10 @@
       /* white-ish 2.5D halo */
       box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.10),
-        0 1px 20px rgba(255, 255, 255, 0.18);
+        0 26px 52px rgba(255, 255, 255, 0.18);
 
       backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(1px);
+      -webkit-backdrop-filter: blur(18px);
 
       transition:
         transform 0.3s ease,
@@ -124,7 +122,7 @@
     .glass-dark:hover {
       transform: translateY(-4px) scale(1.01);
       background:
-        radial-gradient(circle at 50% 38%, #3a3a3a 0%, #050505 60%);
+        radial-gradient(circle at 50% 38%, var(--card-glow-color) 0%, #050505 60%);
       border-color: rgba(255, 255, 255, 0.32);
       box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.16),
@@ -157,7 +155,7 @@
       background: radial-gradient(
         circle at 50% 50%,
         rgba(255,255,255,0.6) 0%,
-        rgba(255,255,255,0.1) 30%,
+        rgba(255,255,255,0.18) 30%,
         transparent 65%
       );
       filter: blur(18px);
@@ -288,8 +286,104 @@
         display: none;
       }
     }
-  </style>
 
+    /* PASTEL GLOW PICKER */
+    .glow-picker {
+      position: fixed;
+      left: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .glow-toggle {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: radial-gradient(circle at 30% 0%, #ffffff33, #111827);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.18),
+        0 18px 32px rgba(0,0,0,0.9);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .glow-toggle span {
+      font-size: 18px;
+    }
+
+    .glow-toggle:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.22),
+        0 22px 40px rgba(0,0,0,0.95);
+    }
+
+    .glow-toggle.open {
+      transform: translateY(-2px) scale(1.03) rotate(20deg);
+    }
+
+    .glow-palette {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.10),
+        0 18px 32px rgba(0,0,0,0.9);
+      opacity: 0;
+      transform: translateX(-10px) scale(0.9);
+      pointer-events: none;
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .glow-palette.open {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .glow-swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.7);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+    }
+
+    .glow-swatch:hover {
+      transform: translateY(-2px) scale(1.07);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.9),
+        0 8px 16px rgba(0,0,0,0.9);
+    }
+
+    .glow-swatch.active {
+      box-shadow:
+        0 0 0 2px #ffffff,
+        0 10px 18px rgba(0,0,0,0.95);
+    }
+  </style>
 </head>
 
 <body class="antialiased">
@@ -301,7 +395,7 @@
   <div class="background-overlay"></div>
   <div class="background-noise"></div>
 
-  <!-- Floating interactive hook -->
+  <!-- Floating contact hook -->
   <a
     href="#contact"
     class="hook-pill fixed right-5 bottom-5 z-40 hidden sm:inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white hover:text-amber-100 transition-transform"
@@ -314,6 +408,24 @@
       <span class="block text-[11px] text-slate-200/80">Tap to start a sprint</span>
     </span>
   </a>
+
+  <!-- Pastel glow colour picker -->
+  <div class="glow-picker">
+    <button id="glowToggle" class="glow-toggle" type="button">
+      <span>🎨</span>
+    </button>
+
+    <div id="glowPalette" class="glow-palette">
+      <!-- 7 pastel rainbow swatches -->
+      <button class="glow-swatch active" type="button" data-color="#2b2b2b" title="Default"></button>
+      <button class="glow-swatch" type="button" data-color="#fecaca" title="Pastel red"></button>
+      <button class="glow-swatch" type="button" data-color="#fed7aa" title="Pastel orange"></button>
+      <button class="glow-swatch" type="button" data-color="#fef3c7" title="Pastel yellow"></button>
+      <button class="glow-swatch" type="button" data-color="#bbf7d0" title="Pastel green"></button>
+      <button class="glow-swatch" type="button" data-color="#bae6fd" title="Pastel blue"></button>
+      <button class="glow-swatch" type="button" data-color="#e9d5ff" title="Pastel purple"></button>
+    </div>
+  </div>
 
   <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
     <!-- NAVBAR -->
@@ -388,7 +500,7 @@
           </h1>
 
           <p class="text-[13px] sm:text-sm md:text-base text-slate-300 max-w-xl leading-relaxed">
-            Python pipelines, voice clones, TTS/STT, subtitles, YouTube automation and UI that feels like a sci-fi internal tool. Matte black, frosted glass and controlled motion.
+            Python pipelines, voice clones, TTS/STT, subtitles, YouTube automation and UI that feels like a sci-fi internal tool. Matte black, glass and controlled motion.
           </p>
 
           <div class="flex flex-wrap items-center gap-3 pt-1">
@@ -1064,6 +1176,32 @@
       { threshold: 0.15 }
     );
     revealEls.forEach((el) => observer.observe(el));
+
+    // Pastel glow picker
+    const glowToggle = document.getElementById("glowToggle");
+    const glowPalette = document.getElementById("glowPalette");
+    const swatches = document.querySelectorAll(".glow-swatch");
+
+    if (glowToggle && glowPalette && swatches.length) {
+      glowToggle.addEventListener("click", () => {
+        glowToggle.classList.toggle("open");
+        glowPalette.classList.toggle("open");
+      });
+
+      swatches.forEach((swatch) => {
+        swatch.addEventListener("click", () => {
+          const color = swatch.getAttribute("data-color");
+          if (!color) return;
+
+          // update CSS variable → all .glass-dark backgrounds change
+          document.documentElement.style.setProperty("--card-glow-color", color);
+
+          // active state
+          swatches.forEach(s => s.classList.remove("active"));
+          swatch.classList.add("active");
+        });
+      });
+    }
   </script>
 </body>
 </html>
